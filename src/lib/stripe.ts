@@ -16,3 +16,10 @@ export const getProducts = async () => {
   })
   return products
 }
+
+export const getProductById = async (id: string) => {
+  const product = await stripe.products.retrieve(id, {
+    expand: ['default_price'],
+  })
+  return product
+}
