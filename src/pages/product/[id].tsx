@@ -4,12 +4,15 @@ import {
   ProductContainer,
   ProductDetails,
 } from '@/styles/pages/product'
-import { GetStaticPaths, GetStaticProps } from 'next'
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useCart } from '@/contexts/CartContext'
+import { ShoppingCart } from 'phosphor-react'
 import Stripe from 'stripe'
+import { styled } from '@stitches/react'
 
 interface ProductProps {
   product: {
@@ -24,33 +27,24 @@ interface ProductProps {
 
 export default function Product({ product }: ProductProps) {
   const { isFallback } = useRouter()
-
+  const { addToCart, cartItems } = useCart()
   const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
     useState(false)
+  const [isAdded, setIsAdded] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false)
+
+  const handleAddToCart = () => {
+    addToCart(product)
+    setIsAdded(true)
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsAdded(false), 2000)
+    return () => clearTimeout(timer)
+  }, [isAdded])
 
   if (isFallback) {
     return <h1>Carregando...</h1>
-  }
-
-  const handleBuyProduct = async () => {
-    try {
-      setIsCreatingCheckoutSession(true)
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ priceId: product.defaultPriceId }),
-      })
-
-      const { checkoutUrl } = await response.json()
-
-      window.location.href = checkoutUrl
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setIsCreatingCheckoutSession(false)
-    }
   }
 
   return (
@@ -69,10 +63,14 @@ export default function Product({ product }: ProductProps) {
           <span>{product.price}</span>
           <p>{product.description}</p>
           <button
-            onClick={handleBuyProduct}
-            disabled={isCreatingCheckoutSession}
+            disabled={isCreatingCheckoutSession || isAdded}
+            onClick={handleAddToCart}
           >
-            Comprar
+            {isCreatingCheckoutSession
+              ? 'Carregando...'
+              : isAdded
+              ? 'Adicionado ao carrinho'
+              : 'Adicionar ao carrinho'}
           </button>
         </ProductDetails>
       </ProductContainer>
@@ -80,20 +78,8 @@ export default function Product({ product }: ProductProps) {
   )
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: [
-      {
-        params: { id: '' },
-      },
-    ],
-    fallback: true,
-  }
-}
-
-export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
-  params,
-}) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  console.log('estou no server side')
   const productId = params?.id
 
   const productFromStripe = await getProductById(productId as string)
@@ -115,6 +101,5 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
         defaultPriceId: price.id,
       },
     },
-    revalidate: 60 * 60 * 1, // 1 hour
   }
 }
