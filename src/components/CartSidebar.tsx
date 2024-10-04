@@ -1,6 +1,6 @@
 import { styled } from '@/styles'
 import { useCart } from '@/contexts/CartContext'
-import { X } from 'phosphor-react'
+import { X, Minus, Plus } from 'phosphor-react'
 import Image from 'next/image'
 
 interface CartSidebarProps {
@@ -8,7 +8,7 @@ interface CartSidebarProps {
 }
 
 export function CartSidebar({ onClose }: CartSidebarProps) {
-  const { cartItems, formattedCartTotal, removeFromCart, totalItems } =
+  const { cartItems, formattedCartTotal, removeFromCart, totalItems, incrementQuantity, decrementQuantity } =
     useCart()
 
   return (
@@ -23,7 +23,6 @@ export function CartSidebar({ onClose }: CartSidebarProps) {
         <>
           {cartItems.map((item) => (
             <CartItem key={item.id}>
-              {/* Renderize as informações do item aqui */}
               <ImageContainer>
                 <Image src={item.imageUrl} width={100} height={90} alt='' />
               </ImageContainer>
@@ -31,6 +30,18 @@ export function CartSidebar({ onClose }: CartSidebarProps) {
               <CartItemInfo>
                 <CartItemName>{item.name}</CartItemName>
                 <CartItemPrice>{item.price}</CartItemPrice>
+                <QuantityControl>
+                  <QuantityButton 
+                    onClick={() => decrementQuantity(item.id)} 
+                    disabled={item.quantity === 1}
+                  >
+                    <Minus size={14} />
+                  </QuantityButton>
+                  <QuantityDisplay>{item.quantity}</QuantityDisplay>
+                  <QuantityButton onClick={() => incrementQuantity(item.id)}>
+                    <Plus size={14} />
+                  </QuantityButton>
+                </QuantityControl>
                 <RemoveButton onClick={() => removeFromCart(item.id)}>
                   Remover
                 </RemoveButton>
@@ -173,4 +184,37 @@ export const ImageContainer = styled('div', {
   img: {
     objectFit: 'cover',
   },
+})
+
+const QuantityControl = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  marginTop: '0.5rem',
+})
+
+const QuantityButton = styled('button', {
+  background: 'none',
+  border: '1px solid $gray700',
+  color: '$gray300',
+  cursor: 'pointer',
+  padding: '0.25rem',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: '4px',
+
+  '&:disabled': {
+    opacity: 0.5,
+    cursor: 'not-allowed',
+  },
+
+  '&:hover:not(:disabled)': {
+    color: '$gray100',
+    borderColor: '$gray300',
+  },
+})
+
+const QuantityDisplay = styled('span', {
+  margin: '0 0.5rem',
+  color: '$gray100',
 })
