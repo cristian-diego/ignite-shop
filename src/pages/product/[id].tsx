@@ -20,6 +20,7 @@ interface ProductProps {
     name: string
     imageUrl: string
     price: string
+    priceUnitAmount: number
     description: string
     defaultPriceId: string
   }
@@ -27,11 +28,10 @@ interface ProductProps {
 
 export default function Product({ product }: ProductProps) {
   const { isFallback } = useRouter()
-  const { addToCart, cartItems } = useCart()
+  const { addToCart } = useCart()
   const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
     useState(false)
   const [isAdded, setIsAdded] = useState(false)
-  const [isCartOpen, setIsCartOpen] = useState(false)
 
   const handleAddToCart = () => {
     addToCart(product)
@@ -97,6 +97,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
         name: productFromStripe.name,
         imageUrl: productFromStripe.images[0],
         price: formattedPrice,
+        priceUnitAmount: price.unit_amount ?? 0,
         description: productFromStripe.description,
         defaultPriceId: price.id,
       },

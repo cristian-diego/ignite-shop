@@ -4,6 +4,7 @@ interface CartItem {
   id: string
   name: string
   price: string
+  priceUnitAmount: number
   imageUrl: string
   quantity: number
   defaultPriceId: string
@@ -14,7 +15,8 @@ interface CartContextData {
   addToCart: (product: any) => void
   removeFromCart: (productId: string) => void
   clearCart: () => void
-  cartTotal: number
+  formattedCartTotal: string
+  totalItems: number
 }
 
 const CartContext = createContext<CartContextData>({} as CartContextData)
@@ -27,15 +29,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const storedCart = localStorage.getItem('cart')
 
-    console.log('stored cart', cartItems)
     if (storedCart) {
       setCartItems(JSON.parse(storedCart))
     }
   }, [])
 
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems))
-    console.log('persisted cart', cartItems)
+    if (cartItems.length > 0) {
+      console.log('will persist', cartItems)
+      localStorage.setItem('cart', JSON.stringify(cartItems))
+    }
   }, [cartItems])
 
   const addToCart = (product: any) => {
@@ -63,15 +66,28 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     setCartItems([])
   }
 
+  const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0)
+
   const cartTotal = cartItems.reduce(
-    (total, item) =>
-      total + parseFloat(item.price.replace('R$', '').trim()) * item.quantity,
+    (total, item) => total + item.priceUnitAmount * item.quantity,
     0
   )
 
+  const formattedCartTotal = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(cartTotal / 100)
+
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, clearCart, cartTotal }}
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        clearCart,
+        formattedCartTotal,
+        totalItems,
+      }}
     >
       {children}
     </CartContext.Provider>

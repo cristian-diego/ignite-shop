@@ -1,10 +1,11 @@
 import { styled } from '@/styles'
 import { ShoppingCart } from 'phosphor-react'
 import { useCart } from '@/contexts/CartContext'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CartSidebar } from '@/components/CartSidebar'
 import Image from 'next/image'
 import logo from '@/assets/logo.svg'
+import Link from 'next/link'
 
 export default function Header() {
   const { cartItems } = useCart()
@@ -13,9 +14,15 @@ export default function Header() {
   const handleOpenCart = () => setIsCartOpen(true)
   const handleCloseCart = () => setIsCartOpen(false)
 
+  useEffect(() => {
+    console.log('load header', cartItems)
+  }, [])
+
   return (
     <HeaderContainer>
-      <Image src={logo} alt='' />
+      <Link href='/'>
+        <Image src={logo} alt='' />
+      </Link>
       <CartIcon onClick={handleOpenCart}>
         <ShoppingCart size={24}></ShoppingCart>
         {cartItems.length > 0 && <CartBadge>{cartItems.length}</CartBadge>}
