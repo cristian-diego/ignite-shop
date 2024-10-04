@@ -9,6 +9,8 @@ import Link from 'next/link'
 import Head from 'next/head'
 import { ShoppingCart } from 'phosphor-react'
 import { useCart } from '@/contexts/CartContext'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 interface HomeProps {
   formattedProducts: {
@@ -28,6 +30,13 @@ export default function Home({ formattedProducts }: HomeProps) {
       spacing: 48,
     },
   })
+
+  const handleAddToCart = (event: React.MouseEvent, product: any) => {
+    event.preventDefault()
+    event.stopPropagation()
+    addToCart(product)
+    toast.success('Product added to cart!')
+  }
 
   return (
     <>
@@ -51,7 +60,7 @@ export default function Home({ formattedProducts }: HomeProps) {
                   <span>{product.price}</span>
                 </div>
 
-                <AddToCartButton onClick={() => addToCart(product)}>
+                <AddToCartButton onClick={(e) => handleAddToCart(e, product)}>
                   <ShoppingCart size={32} weight='bold' />
                 </AddToCartButton>
               </footer>

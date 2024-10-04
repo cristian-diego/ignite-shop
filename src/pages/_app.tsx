@@ -4,6 +4,7 @@ import { CartProvider } from '@/contexts/CartContext'
 
 import { Container } from '@/styles/pages/app'
 import Header from '../components/Header'
+import { ToastContainer } from 'react-toastify'
 globalStyles()
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -11,6 +12,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <CartProvider>
       <Container>
         <Header />
+        <ToastContainer />
         <Component {...pageProps} />
       </Container>
     </CartProvider>
