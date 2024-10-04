@@ -4,15 +4,13 @@ import {
   ProductContainer,
   ProductDetails,
 } from '@/styles/pages/product'
-import { GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next'
+import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { useCart } from '@/contexts/CartContext'
-import { ShoppingCart } from 'phosphor-react'
 import Stripe from 'stripe'
-import { styled } from '@stitches/react'
 
 interface ProductProps {
   product: {
@@ -79,7 +77,6 @@ export default function Product({ product }: ProductProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  console.log('estou no server side')
   const productId = params?.id
 
   const productFromStripe = await getProductById(productId as string)

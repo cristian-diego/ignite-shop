@@ -2,14 +2,54 @@ import { styled } from '@/styles'
 import { useCart } from '@/contexts/CartContext'
 import { X, Minus, Plus } from 'phosphor-react'
 import Image from 'next/image'
+import { toast } from 'react-toastify'
+import { useState } from 'react'
 
 interface CartSidebarProps {
   onClose: () => void
 }
 
 export function CartSidebar({ onClose }: CartSidebarProps) {
-  const { cartItems, formattedCartTotal, removeFromCart, totalItems, incrementQuantity, decrementQuantity } =
-    useCart()
+  const {
+    cartItems,
+    formattedCartTotal,
+    removeFromCart,
+    totalItems,
+    incrementQuantity,
+    decrementQuantity,
+  } = useCart()
+
+  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
+    useState(false)
+
+  const handleCheckout = async () => {
+    try {
+      setIsCreatingCheckoutSession(true)
+
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+          cartItems.map((item) => {
+            return {
+              defaultPriceId: item.defaultPriceId,
+              quantity: item.quantity,
+            }
+          })
+        ),
+      })
+
+      const { checkoutUrl } = await response.json()
+
+      window.location.href = checkoutUrl
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsCreatingCheckoutSession(false)
+    }
+  }
 
   return (
     <SidebarContainer>
@@ -31,8 +71,8 @@ export function CartSidebar({ onClose }: CartSidebarProps) {
                 <CartItemName>{item.name}</CartItemName>
                 <CartItemPrice>{item.price}</CartItemPrice>
                 <QuantityControl>
-                  <QuantityButton 
-                    onClick={() => decrementQuantity(item.id)} 
+                  <QuantityButton
+                    onClick={() => decrementQuantity(item.id)}
                     disabled={item.quantity === 1}
                   >
                     <Minus size={14} />
@@ -61,7 +101,12 @@ export function CartSidebar({ onClose }: CartSidebarProps) {
             </TotalContainer>
           </div>
 
-          <CheckoutButton>Finalizar compra</CheckoutButton>
+          <CheckoutButton
+            onClick={handleCheckout}
+            disabled={isCreatingCheckoutSession}
+          >
+            Finalizar compra
+          </CheckoutButton>
         </>
       )}
     </SidebarContainer>

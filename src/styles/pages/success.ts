@@ -8,6 +8,13 @@ export const SuccessContainer = styled('main', {
   margin: '0 auto',
   height: 656,
 
+  div: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: '1rem',
+  },
+
   h1: {
     fontSize: '$2xl',
     color: '$gray100',

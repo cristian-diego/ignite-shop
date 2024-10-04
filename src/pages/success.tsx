@@ -1,9 +1,11 @@
+import { useCart } from '@/contexts/CartContext'
 import { stripe } from '@/lib/stripe'
 import { SuccessContainer, ImageContainer } from '@/styles/pages/success'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 interface SuccessProps {
   customerName: string
@@ -14,6 +16,11 @@ interface SuccessProps {
 }
 
 export default function Success({ customerName, products }: SuccessProps) {
+  const { clearCart } = useCart()
+  useEffect(() => {
+    clearCart()
+  }, [])
+
   return (
     <>
       <Head>
@@ -24,17 +31,19 @@ export default function Success({ customerName, products }: SuccessProps) {
       <SuccessContainer>
         <h1>Compra efetuada!</h1>
 
-        <ImageContainer>
+        <div>
           {products.map((product, index) => (
-            <Image
-              key={index}
-              src={product.imageUrl}
-              width={120}
-              height={110}
-              alt=''
-            />
+            <ImageContainer key={index}>
+              <Image
+                key={index}
+                src={product.imageUrl}
+                width={120}
+                height={110}
+                alt=''
+              />
+            </ImageContainer>
           ))}
-        </ImageContainer>
+        </div>
 
         <p>
           Uhuul <strong>{customerName}</strong>, sua compra de {products.length}{' '}
@@ -49,7 +58,7 @@ export default function Success({ customerName, products }: SuccessProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  if (query.session_id) {
+  if (!query.session_id) {
     return {
       redirect: {
         destination: '/',

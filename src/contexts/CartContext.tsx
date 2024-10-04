@@ -1,18 +1,18 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
 
-interface CartItem {
+export interface CartItem {
   id: string
   name: string
   price: string
   priceUnitAmount: number
   imageUrl: string
-  quantity: number
+  quantity?: number
   defaultPriceId: string
 }
 
 interface CartContextData {
   cartItems: CartItem[]
-  addToCart: (product: any) => void
+  addToCart: (product: CartItem) => void
   removeFromCart: (productId: string) => void
   clearCart: () => void
   formattedCartTotal: string
@@ -43,14 +43,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [cartItems])
 
-  const addToCart = (product: any) => {
+  const addToCart = (product: CartItem) => {
     console.log('addToCart', product)
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === product.id)
       const updatedItems = existingItem
         ? prevItems.map((item) =>
             item.id === product.id
-              ? { ...item, quantity: item.quantity + 1 }
+              ? { ...item, quantity: (item.quantity ?? 0) + 1 }
               : item
           )
         : [...prevItems, { ...product, quantity: 1 }]
@@ -67,6 +67,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const clearCart = () => {
     setCartItems([])
+    localStorage.setItem('cart', JSON.stringify([]))
   }
 
   const incrementQuantity = (productId: string) => {

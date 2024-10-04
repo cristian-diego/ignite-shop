@@ -88,6 +88,7 @@ export const getStaticProps: GetStaticProps = async () => {
       imageUrl: product.images[0],
       price: formattedPrice,
       priceUnitAmount: price.unit_amount ?? 0,
+      defaultPriceId: price.id,
     }
   })
 
