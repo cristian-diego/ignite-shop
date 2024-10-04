@@ -1,4 +1,4 @@
-import { HomeContainer, Product } from '@/styles/pages/home'
+import { AddToCartButton, HomeContainer, Product } from '@/styles/pages/home'
 import Image from 'next/image'
 import { useKeenSlider } from 'keen-slider/react'
 import 'keen-slider/keen-slider.min.css'
@@ -7,6 +7,8 @@ import { GetStaticProps } from 'next'
 import Stripe from 'stripe'
 import Link from 'next/link'
 import Head from 'next/head'
+import { ShoppingCart } from 'phosphor-react'
+import { useCart } from '@/contexts/CartContext'
 
 interface HomeProps {
   formattedProducts: {
@@ -14,10 +16,12 @@ interface HomeProps {
     name: string
     imageUrl: string
     price: number
+    priceUnitAmount: number
   }[]
 }
 
 export default function Home({ formattedProducts }: HomeProps) {
+  const { addToCart } = useCart()
   const [sliderRef] = useKeenSlider({
     slides: {
       perView: 1.8,
@@ -42,8 +46,14 @@ export default function Home({ formattedProducts }: HomeProps) {
               <Image src={product.imageUrl} width={520} height={480} alt='' />
 
               <footer>
-                <strong>{product.name}</strong>
-                <span>{product.price}</span>
+                <div>
+                  <strong>{product.name}</strong>
+                  <span>{product.price}</span>
+                </div>
+
+                <AddToCartButton onClick={() => addToCart(product)}>
+                  <ShoppingCart size={32} weight='bold' />
+                </AddToCartButton>
               </footer>
             </Product>
           </Link>
@@ -68,6 +78,7 @@ export const getStaticProps: GetStaticProps = async () => {
       name: product.name,
       imageUrl: product.images[0],
       price: formattedPrice,
+      priceUnitAmount: price.unit_amount ?? 0,
     }
   })
 
