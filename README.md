@@ -18,6 +18,10 @@ Ignite Shop is a Next.js application developed as part of the Rocketseat curricu
 - React Toastify - Toast Notification
 - Cursor AI (Build the cart feature)
 
+## Preview 
+
+![ignite-shop](https://github.com/user-attachments/assets/623af5a6-4081-47e9-aed6-6ee41a3f12a1)
+
 ### Installation
 
 1. Clone the repository
@@ -37,16 +41,13 @@ Ignite Shop is a Next.js application developed as part of the Rocketseat curricu
    yarn install
    ```
 4. Create .env.local file
+   ```bash
+   STRIPE_PUBLIC_KEY=YOUR_PUBLIC_KEY
+   STRIPE_SECRET_KEY=YOUR_SECRET_KEY
+   NEXT_URL=YOUR_REDIRECT_URL
+   ```
+5. Run the application
+   ```bash
+   npm run dev
+   ```
 
-# Stripe
-
-STRIPE_PUBLIC_KEY=YOUR_PUBLIC_KEY
-STRIPE_SECRET_KEY=YOUR_SECRET_KEY
-
-# Next
-
-NEXT_URL=YOUR_REDIRECT_URL
-
-### Running the Application
-
-To start the development server:
